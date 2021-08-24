@@ -5,10 +5,7 @@ const MenuItem = ({ title, imageUrl, size, history, linkUrl, match }) => (
   <div
     className={`menu-item ${size}`}
     onClick={() => history.push(`${match.url}${linkUrl}`)}
-    onKeyUp={(e) =>
-      (e.key === "Enter" || e.key === "NumpadEnter") &&
-      history.push(`${match.url}${linkUrl}`)
-    }
+    onKeyUp={(e) => e.code === 13 && history.push(`${match.url}${linkUrl}`)}
     role="navigation"
     tabIndex="0"
   >
@@ -21,7 +18,6 @@ const MenuItem = ({ title, imageUrl, size, history, linkUrl, match }) => (
     <div className="content">
       <div className="title">{title}</div>
       <span className="subtitle">SHOP NOW</span>
-      <img src alt="" />
     </div>
   </div>
 );
