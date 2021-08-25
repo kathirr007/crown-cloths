@@ -1,6 +1,8 @@
+import React from 'react'
+
 import './SignInAndSignUp.scss'
 
-import SignIn from '../../components/sign-in/SignIn'
+import SignIn from '@/components/sign-in/SignIn'
 
 const SignInAndSignUp = () => (
   <div className='sign-in-and-sign-up'>
