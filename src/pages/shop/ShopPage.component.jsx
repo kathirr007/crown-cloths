@@ -15,12 +15,12 @@ class ShopPage extends React.Component {
   render() {
     const { collections } = this.state;
     return (
-      <div>
-        <h1>Shop Page</h1>
+      <main className="shop-page">
+        <h1>Collections</h1>
         {collections.map(({ id, ...otherCollectionProps }) => (
           <CollectionPreview key={id} {...otherCollectionProps} />
         ))}
-      </div>
+      </main>
     );
   }
 }
