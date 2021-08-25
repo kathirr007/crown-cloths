@@ -1,6 +1,14 @@
 /* eslint-disable no-unused-vars */
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  addDoc,
+  getDocs,
+  setDoc
+} from 'firebase/firestore'
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 
 const firebaseConfig = {
@@ -15,7 +23,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 
 export const auth = getAuth()
-export const appFirestore = getFirestore(app)
+export const db = getFirestore()
 const provider = new GoogleAuthProvider()
 
 export const signInWithGoogle = () =>
@@ -38,3 +46,29 @@ export const signInWithGoogle = () =>
       const credential = GoogleAuthProvider.credentialFromError(error)
       // ...
     })
+
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  if (!userAuth) return
+  const userRef = doc(db, `users/${userAuth.uid}`)
+  const snapShot = await getDoc(userRef)
+
+  if (!snapShot.exists()) {
+    const { displayName, email } = userAuth
+    const createdAt = new Date()
+
+    try {
+      const newUser = await setDoc(userRef, {
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      })
+
+      console.log('New User has been added with ID: ', newUser.id)
+    } catch (error) {
+      console.log(`Error in creating user ${error.message}`)
+    }
+  }
+
+  return userRef
+}

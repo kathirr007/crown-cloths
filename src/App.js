@@ -6,7 +6,8 @@ import HomePage from './pages/homepage/HomePage'
 import ShopPage from './pages/shop/ShopPage'
 import Header from './components/header/Header'
 import SignInAndSignUp from './pages/sign-in-and-sign-up/SignInAndSignUp'
-import { auth } from './firebase/firebase.utils'
+import { auth, createUserProfileDocument } from './firebase/firebase.utils'
+import { onSnapshot } from 'firebase/firestore'
 
 import './App.scss'
 
@@ -29,9 +30,26 @@ class App extends React.Component {
 
   componentDidMount() {
     loadFonts(fontsToLoad)
-    this.unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
-      this.setState({ currentUser: user })
-      console.log(user)
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth)
+        onSnapshot(userRef, (snapShot) => {
+          this.setState(
+            {
+              currentUser: {
+                id: snapShot.id,
+                ...snapShot.data()
+              }
+            },
+            () => {
+              console.log(this.state)
+            }
+          )
+        })
+      }
+      // createUserProfileDocument(userAuth)
+      // console.log(userAuth)
+      this.setState({ currentUser: userAuth })
     })
   }
 
