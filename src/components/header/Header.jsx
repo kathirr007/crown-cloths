@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from '../../assets/crown.svg'
 
-import './Header.styles.scss'
+import './Header.scss'
 
 const Header = () => (
-  <div className='header'>
+  <header className='header'>
     <Link className='logo-container' to='/'>
+      <h1 className='sr-only'>Crown Cloths</h1>
       <Logo className='logo' />
     </Link>
     <div className='options'>
@@ -16,7 +17,7 @@ const Header = () => (
         Contact
       </Link>
     </div>
-  </div>
+  </header>
 )
 
 export default Header

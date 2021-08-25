@@ -1,9 +1,10 @@
 import { Switch, Route } from 'react-router-dom'
 import { loadFonts } from './utils/utils'
 
-import HomePage from './pages/homepage/HomePage.component'
-import ShopPage from './pages/shop/ShopPage.component'
-import Header from './components/header/Header.component'
+import HomePage from './pages/homepage/HomePage'
+import ShopPage from './pages/shop/ShopPage'
+import Header from './components/header/Header'
+import SignInAndSignUp from './pages/sign-in-and-sign-up/SignInAndSignUp'
 
 import './App.scss'
 
@@ -22,6 +23,7 @@ function App() {
       <Switch>
         <Route exact path='/' component={HomePage} />
         <Route path='/shop' component={ShopPage} />
+        <Route path='/signin' component={SignInAndSignUp} />
       </Switch>
     </div>
   )
