@@ -15,7 +15,13 @@
     height: 240px;
     display: flex;
     flex-direction: column;
-    overflow: scroll;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  .empty-message {
+    font-size: 1.5rem;
+    margin: 50px auto;
   }
 
   button {

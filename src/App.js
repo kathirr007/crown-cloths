@@ -4,14 +4,17 @@ import { loadFonts } from './utils/utils'
 import { auth, createUserProfileDocument } from './firebase/firebase.utils'
 import { onSnapshot } from 'firebase/firestore'
 import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 import { setCurrentUser } from './redux/user/user.actions'
 
 import HomePage from './pages/homepage/HomePage'
 import ShopPage from './pages/shop/ShopPage'
+import CheckoutPage from './pages/checkout/CheckoutPage'
 import Header from './components/header/Header'
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/SignInAndSignUpPage'
 
 import './App.scss'
+import { selectCurrentUser } from './redux/user/user.selectors'
 
 let fontsToLoad = [
   {
@@ -53,6 +56,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' component={HomePage} />
           <Route path='/shop' component={ShopPage} />
+          <Route exact path='/checkout' component={CheckoutPage} />
           <Route
             exact
             path='/signin'
@@ -70,8 +74,8 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({
-  currentUser: user.currentUser
+const mapStateToProps = createStructuredSelector({
+  currentUser: selectCurrentUser
 })
 
 const mapDispatchToProps = (dispatch) => ({
