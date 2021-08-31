@@ -10,6 +10,8 @@
   .image-container {
     width: 23%;
     padding-right: 15px;
+    max-height: 245px;
+    overflow: hidden;
 
     img {
       width: 100%;
