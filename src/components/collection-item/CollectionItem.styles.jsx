@@ -18,7 +18,7 @@ export const CollectionItemContainer = styled.div`
     transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
-  button {
+  .custom-button {
     width: 80%;
     opacity: 0.7;
     position: absolute;
@@ -31,7 +31,7 @@ export const CollectionItemContainer = styled.div`
     .image {
       opacity: 0.8;
     }
-    button {
+    .custom-button {
       opacity: 0.85;
       display: flex;
     }
