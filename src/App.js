@@ -6,6 +6,8 @@ import { onSnapshot } from 'firebase/firestore'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { setCurrentUser } from './redux/user/user.actions'
+import { selectCurrentUser } from './redux/user/user.selectors'
+import { selectCollectionsForPreview } from './redux/shop/shop.selectors'
 
 import HomePage from './pages/homepage/HomePage'
 import ShopPage from './pages/shop/ShopPage'
@@ -14,7 +16,6 @@ import Header from './components/header/Header'
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/SignInAndSignUpPage'
 
 import './App.scss'
-import { selectCurrentUser } from './redux/user/user.selectors'
 
 let fontsToLoad = [
   {
@@ -42,6 +43,14 @@ class App extends React.Component {
         })
       }
       setCurrentUser(userAuth)
+      /* addCollectionAndDocuments(
+        'collections',
+        collectionsArray.map(({ title, items, routeName }) => ({
+          title,
+          items,
+          routeName
+        }))
+      ) */
     })
   }
 
@@ -75,7 +84,8 @@ class App extends React.Component {
 }
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  collectionsArray: selectCollectionsForPreview
 })
 
 const mapDispatchToProps = (dispatch) => ({

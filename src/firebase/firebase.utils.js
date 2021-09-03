@@ -7,7 +7,8 @@ import {
   getDoc,
   addDoc,
   getDocs,
-  setDoc
+  setDoc,
+  writeBatch
 } from 'firebase/firestore'
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 
@@ -23,7 +24,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 
 export const auth = getAuth()
-export const db = getFirestore()
+export const db = getFirestore(app)
 const provider = new GoogleAuthProvider()
 
 export const signInWithGoogle = () =>
@@ -71,4 +72,39 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   }
 
   return userRef
+}
+
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
+  const collectionRef = collection(db, collectionKey)
+  console.log(collectionRef)
+  const batch = writeBatch(db)
+
+  objectsToAdd.forEach((obj) => {
+    const newDocRef = doc(collection(db, collectionKey))
+    console.log(newDocRef)
+    batch.set(newDocRef, obj)
+  })
+
+  return await batch.commit()
+}
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+  const transformedCollection = collections.docs.map((doc) => {
+    const { title, items } = doc.data()
+
+    return {
+      routeName: encodeURI(title.toLowerCase()),
+      id: doc.id,
+      title,
+      items
+    }
+  })
+
+  return transformedCollection.reduce((acc, collection) => {
+    acc[collection.title.toLowerCase()] = collection
+    return acc
+  }, {})
 }
