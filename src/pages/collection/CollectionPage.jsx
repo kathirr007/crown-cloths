@@ -1,11 +1,21 @@
 import { connect } from 'react-redux'
 import CollectionItem from '../../components/collection-item/CollectionItem'
-import { selectCollection } from '../../redux/shop/shop.selectors'
+import {
+  selectCollection,
+  selectIsShopErrorMessage
+} from '../../redux/shop/shop.selectors'
 
 import './CollectionPage.scss'
 
-const CollectionPage = ({ collection }) => {
-  const { title, items } = collection
+const CollectionPage = ({ collection, errorMessage }) => {
+  if (errorMessage) {
+    return (
+      <div className='collection-page'>
+        <p>{errorMessage}</p>
+      </div>
+    )
+  }
+  let { title, items } = collection
   return (
     <div className='collection-page'>
       <h2 className='title'>{title} Collection</h2>
@@ -19,7 +29,8 @@ const CollectionPage = ({ collection }) => {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  collection: selectCollection(ownProps.match.params.collectionId)(state)
+  collection: selectCollection(ownProps.match.params.collectionId)(state),
+  errorMessage: selectIsShopErrorMessage(state)
 })
 
 export default connect(mapStateToProps)(CollectionPage)
