@@ -1,8 +1,8 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 import { loadFonts } from './utils/utils'
-import { auth, createUserProfileDocument } from './firebase/firebase.utils'
-import { onSnapshot } from 'firebase/firestore'
+// import { auth, createUserProfileDocument } from './firebase/firebase.utils'
+// import { onSnapshot } from 'firebase/firestore'
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 import { setCurrentUser } from './redux/user/user.actions'
@@ -30,28 +30,20 @@ class App extends React.Component {
   componentDidMount() {
     loadFonts(fontsToLoad)
 
-    const { setCurrentUser } = this.props
+    // const { setCurrentUser } = this.props
 
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
-      if (userAuth) {
-        const userRef = await createUserProfileDocument(userAuth)
-        onSnapshot(userRef, (snapShot) => {
-          setCurrentUser({
-            id: snapShot.id,
-            ...snapShot.data()
-          })
-        })
-      }
-      setCurrentUser(userAuth)
-      /* addCollectionAndDocuments(
-        'collections',
-        collectionsArray.map(({ title, items, routeName }) => ({
-          title,
-          items,
-          routeName
-        }))
-      ) */
-    })
+    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+    //   if (userAuth) {
+    //     const userRef = await createUserProfileDocument(userAuth)
+    //     onSnapshot(userRef, (snapShot) => {
+    //       setCurrentUser({
+    //         id: snapShot.id,
+    //         ...snapShot.data()
+    //       })
+    //     })
+    //   }
+    //   setCurrentUser(userAuth)
+    // })
   }
 
   componentWillUnmount() {
