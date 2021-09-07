@@ -1,54 +1,128 @@
 import { takeLatest, put, all, call } from '@redux-saga/core/effects'
-import { signInWithPopup } from '@firebase/auth'
+import {
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from '@firebase/auth'
 
 import UserActionTypes from './user.types'
 import {
   auth,
   googleProvider,
-  createUserProfileDocument
+  createUserProfileDocument,
+  getCurrentUser
 } from '../../firebase/firebase.utils'
-import { googleSignInSuccess, googleSignInFailure } from './user.actions'
+import {
+  signInSuccess,
+  signInFailure,
+  signOutFailure,
+  signOutSuccess,
+  signUpFailure,
+  signUpSuccess
+} from './user.actions'
 import { getDoc } from '@firebase/firestore'
 
-export function* signInWithGoogle() {
+export function* getSnapshotFromUserAuth(userAuth, additionalData) {
   try {
-    const { user } = yield signInWithPopup(auth, googleProvider)
-    const userRef = yield call(createUserProfileDocument, user)
-    debugger
+    const userRef = yield call(
+      createUserProfileDocument,
+      userAuth,
+      additionalData
+    )
     const userSnapshot = yield getDoc(userRef)
     yield put(
-      googleSignInSuccess({
+      signInSuccess({
         id: userSnapshot.id,
         ...userSnapshot.data()
       })
     )
-    // .then((result) => {
-    // // This gives you a Google Access Token. You can use it to access the Google API.
-    // const credential = GoogleAuthProvider.credentialFromResult(result)
-    // const token = credential.accessToken
-    // // The signed-in user info.
-    // const user = result.user
-    // // ...
-    // })
-    // .catch((error) => {
-    // // Handle Errors here.
-    // const errorCode = error.code
-    // const errorMessage = error.message
-    // // The email of the user's account used.
-    // const email = error.email
-    // // The AuthCredential type that was used.
-    // const credential = GoogleAuthProvider.credentialFromError(error)
-    // // ...
-    // })
   } catch (error) {
-    yield put(googleSignInFailure(error))
+    signInFailure(error)
   }
+}
+
+export function* signInWithGoogle() {
+  try {
+    const { user } = yield signInWithPopup(auth, googleProvider)
+    yield getSnapshotFromUserAuth(user)
+  } catch (error) {
+    yield put(signInFailure(error))
+  }
+}
+
+export function* signInWithEmail({ payload: { email, password } }) {
+  try {
+    const { user } = yield signInWithEmailAndPassword(auth, email, password)
+    yield getSnapshotFromUserAuth(user)
+  } catch (error) {
+    yield put(signInFailure(error))
+  }
+}
+
+export function* isUserAuthenticated() {
+  try {
+    const userAuth = yield getCurrentUser()
+    if (!userAuth) return
+
+    yield getSnapshotFromUserAuth(userAuth)
+  } catch (error) {
+    yield put(signInFailure(error))
+  }
+}
+
+export function* signOut() {
+  try {
+    yield auth.signOut()
+    yield put(signOutSuccess())
+  } catch (error) {
+    yield put(signOutFailure(error))
+  }
+}
+
+export function* signUp({ payload: { email, password, displayName } }) {
+  try {
+    const { user } = yield createUserWithEmailAndPassword(auth, email, password)
+    yield put(signUpSuccess({ user, additionalData: { displayName } }))
+  } catch (error) {
+    yield put(signUpFailure)
+  }
+}
+
+export function* signInAfterSignUp({ payload: { user, additionalData } }) {
+  yield getSnapshotFromUserAuth(user, additionalData)
+}
+
+export function* onSignUpStart() {
+  yield takeLatest(UserActionTypes.SIGN_UP_START, signUp)
+}
+
+export function* onSignUpSuccess() {
+  yield takeLatest(UserActionTypes.SIGN_UP_SUCCESS, signInAfterSignUp)
 }
 
 export function* onGoogleSignInStart() {
   yield takeLatest(UserActionTypes.GOOGLE_SIGN_IN_START, signInWithGoogle)
 }
 
+export function* onEmailSignInStart() {
+  yield takeLatest(UserActionTypes.EMAIL_SIGN_IN_START, signInWithEmail)
+}
+
+export function* onCheckUserSession() {
+  yield takeLatest(UserActionTypes.CHECK_USER_SESSION, isUserAuthenticated)
+}
+
+export function* onSignOutStart() {
+  yield takeLatest(UserActionTypes.SIGN_OUT_START, signOut)
+}
+
 export function* userSagas() {
-  yield all([call(onGoogleSignInStart)])
+  yield all([
+    call(onGoogleSignInStart),
+    call(onEmailSignInStart),
+    call(onCheckUserSession),
+    call(onSignOutStart),
+    call(onSignUpStart),
+    call(onSignUpSuccess)
+  ])
 }

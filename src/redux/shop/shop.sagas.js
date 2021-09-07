@@ -1,4 +1,4 @@
-import { takeLatest, call, put } from '@redux-saga/core/effects'
+import { takeLatest, call, put, all } from '@redux-saga/core/effects'
 import { collection, getDocs } from '@firebase/firestore'
 
 import {
@@ -37,4 +37,8 @@ export function* fetchCollectionsStart() {
     fetchCollectionsAsync,
     'collections'
   )
+}
+
+export function* shopSagas() {
+  yield all([call(fetchCollectionsStart)])
 }
