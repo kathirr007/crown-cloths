@@ -84,7 +84,7 @@ export function* signUp({ payload: { email, password, displayName } }) {
     const { user } = yield createUserWithEmailAndPassword(auth, email, password)
     yield put(signUpSuccess({ user, additionalData: { displayName } }))
   } catch (error) {
-    yield put(signUpFailure)
+    yield put(signUpFailure(error))
   }
 }
 

@@ -28,6 +28,11 @@ const userRducer = (state = INITIAL_STATE, action) => {
         ...state,
         error: action.payload
       }
+    case UserActionTypes.CLEAR_ERROR:
+      return {
+        ...state,
+        error: null
+      }
 
     default:
       return state

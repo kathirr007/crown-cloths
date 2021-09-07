@@ -1,100 +1,108 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import { createStructuredSelector } from 'reselect'
 
 // import { createUserWithEmailAndPassword } from 'firebase/auth'
 // import { auth, createUserProfileDocument } from '@/firebase/firebase.utils'
-import { signUpStart } from '../../redux/user/user.actions'
+import { selectUserError } from '../../redux/user/user.selectors'
+import { clearUserError, signUpStart } from '../../redux/user/user.actions'
 
 import FormInput from '../form-input/FormInput'
 import CustomButton from '../custom-button/CustomButton'
 
 import './SignUp.scss'
 
-class SignUp extends React.Component {
-  constructor(props) {
-    super(props)
+const SignUp = ({ signUpStart, error, clearErrors }) => {
+  const [userCredentials, setCredentials] = useState({
+    displayName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  })
 
-    this.state = {
-      displayName: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    }
-  }
+  const { displayName, confirmPassword, email, password } = userCredentials
 
-  handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const { signUpStart } = this.props
-    const { displayName, confirmPassword, email, password } = this.state
 
     if (password !== confirmPassword) return
 
     signUpStart({ email, password, displayName })
   }
-  handleChange = (e) => {
+  const handleChange = (e) => {
+    if (error) clearErrors()
+
     const { name, value } = e.target
 
-    this.setState({ [name]: value })
+    setCredentials({ ...userCredentials, [name]: value })
   }
 
-  render() {
-    const { displayName, confirmPassword, email, password } = this.state
-    return (
-      <div className='sign-in'>
-        <h2 className='title'>I don't have an account</h2>
-        <span>Sign up with your email and password</span>
+  return (
+    <div className='sign-up'>
+      <h2 className='title'>I don't have an account</h2>
+      <span>Sign up with your email and password</span>
 
-        <form className='sign-up-form' onSubmit={this.handleSubmit}>
-          <FormInput
-            handleChange={this.handleChange}
-            type='text'
-            name='displayName'
-            id='displayName'
-            label='Display Name'
-            value={displayName}
-            required
-          />
-          <FormInput
-            handleChange={this.handleChange}
-            type='email'
-            name='email'
-            id='signUpEmail'
-            label='Email'
-            value={email}
-            required
-          />
-          <FormInput
-            handleChange={this.handleChange}
-            type='password'
-            name='password'
-            id='signUpPassword'
-            label='Password'
-            value={password}
-            required
-          />
-          <FormInput
-            handleChange={this.handleChange}
-            type='password'
-            name='confirmPassword'
-            id='signUpConfirmPassword'
-            label='Confirm Password'
-            value={confirmPassword}
-            required
-          />
-          <div className='buttons'>
-            <CustomButton type='submit'>Sign Up</CustomButton>
-            {/* <CustomButton onClick={signInWithGoogle} isGoogleSignIn>
+      <strong className='error'>
+        {error ? error.signUpError?.message : null}
+      </strong>
+
+      <form className='sign-up-form' onSubmit={handleSubmit}>
+        <FormInput
+          handleChange={handleChange}
+          type='text'
+          name='displayName'
+          id='displayName'
+          label='Display Name'
+          value={displayName}
+          required
+        />
+        <FormInput
+          handleChange={handleChange}
+          type='email'
+          name='email'
+          id='signUpEmail'
+          label='Email'
+          value={email}
+          required
+        />
+        <FormInput
+          handleChange={handleChange}
+          type='password'
+          name='password'
+          id='signUpPassword'
+          label='Password'
+          value={password}
+          required
+        />
+        <FormInput
+          handleChange={handleChange}
+          type='password'
+          name='confirmPassword'
+          id='signUpConfirmPassword'
+          label='Confirm Password'
+          value={confirmPassword}
+          required
+        />
+        <div className='buttons'>
+          <CustomButton type='submit' onClick={handleSubmit}>
+            Sign Up
+          </CustomButton>
+          {/* <CustomButton onClick={signInWithGoogle} isGoogleSignIn>
               Sign in with Google
             </CustomButton> */}
-          </div>
-        </form>
-      </div>
-    )
-  }
+        </div>
+      </form>
+    </div>
+  )
 }
 
-const mapDispatchToProps = (dispatch) => ({
-  signUpStart: (userCredentials) => dispatch(signUpStart(userCredentials))
+const mapStateToProps = createStructuredSelector({
+  error: selectUserError
 })
 
-export default connect(null, mapDispatchToProps)(SignUp)
+const mapDispatchToProps = (dispatch) => ({
+  signUpStart: (userCredentials) => dispatch(signUpStart(userCredentials)),
+  clearErrors: () => dispatch(clearUserError())
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp)
