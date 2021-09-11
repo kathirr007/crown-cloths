@@ -1,12 +1,33 @@
+import { withRouter } from 'react-router'
 import StripeCheckout from 'react-stripe-checkout'
 import CustomButton from '../custom-button/CustomButton'
+import axios from 'axios'
 
-const StripeCheckoutButton = ({ price }) => {
+const StripeCheckoutButton = ({ price, history }) => {
   const publishableKey = 'pk_test_krAf3HsWv3GLs5EXlXXRpv1O00IWashr2l'
   const priceForStripe = price * 100
   const onToken = (token) => {
     console.log(token)
-    console.log('Payment Successful...')
+    axios({
+      url: 'payment',
+      method: 'post',
+      data: {
+        amount: priceForStripe,
+        token
+      }
+    })
+      .then((res) => {
+        console.log('Payment was successful...')
+        history.push('/')
+      })
+      .catch((err) => {
+        debugger
+        console.log(`Payment error: ${err.response?.data?.error?.message}`)
+
+        // alert(
+        //   'There was an issue with your payment. Please sure you use the provided credit card information'
+        // )
+      })
   }
 
   return (
@@ -29,4 +50,4 @@ const StripeCheckoutButton = ({ price }) => {
   )
 }
 
-export default StripeCheckoutButton
+export default withRouter(StripeCheckoutButton)
